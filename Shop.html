@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - E-commerce</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Ensure html and body don't cause horizontal scroll */
+        html, body {
+            overflow-x: hidden; /* Main fix for horizontal scrollbar */
+            width: 100%; /* Ensure body doesn't try to be wider than viewport */
+            margin: 0; /* Remove default body margin */
+            padding: 0; /* Remove default body padding */
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Universal box-sizing and min-width to prevent overflow */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            /* Added to prevent elements from implicitly creating min-width larger than viewport */
+            min-width: 0;
+        }
+
+        /* General rule for images to prevent them from overflowing their containers */
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block; /* Removes extra space below images */
+        }
+
+        /* Sticky Navigation Bar */
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .navbar-brand img {
+            height: 40px;
+            max-width: 100%; /* Ensure logo scales down properly */
+        }
+        .nav-link {
+            font-weight: 500;
+            color: #333;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #007bff;
+        }
+        /* Remove outline on navbar toggler button when focused for better aesthetics */
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        /* Ensure Bootstrap containers and rows are fully contained */
+        .container, .container-fluid {
+            overflow: hidden; /* Prevents children from spilling out horizontally */
+        }
+        .row {
+            /* Ensure rows behave correctly and don't cause overflow with their negative margins */
+            margin-right: calc(-.5 * var(--bs-gutter-x));
+            margin-left: calc(-.5 * var(--bs-gutter-x));
+            width: calc(100% + var(--bs-gutter-x)); /* Explicitly set width to account for negative margins */
+            overflow: hidden; /* Another layer of defense against child overflow */
+        }
+
+        /* Shop Section */
+        .shop-section {
+            padding: 50px 0;
+        }
+
+        /* Sidebar Filters */
+        .filter-sidebar {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin-bottom: 30px; /* Space below sidebar on smaller screens when it stacks */
+        }
+        .filter-sidebar h5 {
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+        .filter-sidebar .list-group-item {
+            border: none;
+            padding: 8px 0;
+            background-color: transparent;
+            font-weight: 400;
+            color: #555;
+            transition: color 0.2s ease;
+        }
+        .filter-sidebar .list-group-item:hover {
+            color: #007bff;
+            cursor: pointer;
+        }
+        .filter-sidebar .form-label {
+            font-weight: 500;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        /* Ensure range inputs are fully responsive */
+        input[type="range"] {
+            width: 100%;
+        }
+
+
+        /* Product Card */
+        .product-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        .product-card img {
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            height: 220px;
+            object-fit: cover;
+            width: 100%;
+        }
+        .product-card .card-body {
+            padding: 20px;
+            text-align: center;
+        }
+        .product-card .card-title {
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: #343a40;
+            margin-bottom: 8px;
+        }
+        .product-card .card-text.price {
+            font-size: 1.1rem;
+            color: #007bff;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .product-card .btn {
+            width: 100%;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .product-card .btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        /* Sorting Dropdown */
+        .sort-dropdown .dropdown-toggle {
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            color: #343a40;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+        .sort-dropdown .dropdown-toggle:hover {
+            background-color: #f1f1f1;
+            border-color: #007bff;
+        }
+        .sort-dropdown .dropdown-menu {
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .sort-dropdown .dropdown-item {
+            font-weight: 500;
+            color: #343a40;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .sort-dropdown .dropdown-item:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        /* Pagination */
+        .pagination .page-link {
+            color: #007bff;
+            border-color: #dee2e6;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+        .pagination .page-link:hover {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #343a40;
+            color: #f8f9fa;
+            padding: 50px 0;
+            font-size: 0.9rem;
+        }
+        .footer h5 {
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .footer ul {
+            list-style: none;
+            padding: 0;
+        }
+        .footer ul li a {
+            color: #adb5bd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .footer ul li a:hover {
+            color: #007bff;
+        }
+        .footer .social-icons a {
+            color: #f8f9fa;
+            font-size: 1.5rem;
+            margin-right: 15px;
+            transition: color 0.3s ease;
+        }
+        .footer .social-icons a:hover {
+            color: #007bff;
+        }
+        .footer .bottom-bar {
+            border-top: 1px solid #495057;
+            padding-top: 20px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        /* ========================================= */
+        /* Responsive Media Queries (CSS Only) */
+        /* ========================================= */
+
+        /* Extra small devices (portrait phones, less than 576px) */
+        @media (max-width: 575.98px) {
+            .shop-section {
+                padding: 20px 18px; /* Reduce section padding */
+            }
+
+            .filter-sidebar {
+                padding: 15px; /* Reduce sidebar padding */
+                margin-bottom: 20px; /* Ensure space below sidebar when it stacks */
+            }
+            .filter-sidebar h5 {
+                margin-bottom: 10px;
+            }
+
+            .product-card .card-title {
+                font-size: 1rem; /* Smaller product title */
+            }
+            .product-card .card-text.price {
+                font-size: 0.9rem; /* Smaller price font */
+            }
+            .product-card .card-body {
+                padding: 15px; /* Smaller product card body padding */
+            }
+            /* Make product cards stack nicely on extra small screens */
+            .row-cols-1 > * {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            .footer {
+                padding: 20px 0; /* Reduce footer padding */
+                font-size: 0.75rem; /* Smaller font for footer text */
+            }
+            .footer h5 {
+                margin-bottom: 10px;
+                font-size: 1.1rem;
+            }
+            .footer .social-icons a {
+                font-size: 1.2rem; /* Smaller social icons */
+                margin-right: 8px;
+            }
+            .footer .bottom-bar {
+                padding-top: 10px;
+                margin-top: 15px;
+            }
+
+            /* Adjust sorting dropdown for small screens */
+            .d-flex.justify-content-between.align-items-center.mb-4 {
+                flex-direction: column; /* Stack elements vertically */
+                align-items: flex-start !important; /* Align to start */
+                margin-bottom: 20px !important;
+            }
+            .d-flex.justify-content-between.align-items-center.mb-4 h3 {
+                margin-bottom: 10px; /* Space between title and dropdown */
+                font-size: 1.5rem;
+            }
+            .sort-dropdown {
+                width: 100%; /* Make dropdown full width */
+            }
+            .sort-dropdown .dropdown-toggle {
+                width: 100%;
+            }
+        }
+
+        /* Small devices (landscape phones, 576px and up) */
+        @media (min-width: 576px) and (max-width: 767.98px) {
+            .shop-section {
+                padding: 30px 15px;
+            }
+
+            .filter-sidebar {
+                margin-bottom: 30px; /* More space for sidebar on tablets */
+            }
+            /* Ensure product cards are 2 per row */
+            .row-cols-sm-2 > * { /* Changed from md-2 to sm-2 for landscape phones */
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            /* Adjust sorting dropdown for small tablets */
+            .d-flex.justify-content-between.align-items-center.mb-4 {
+                flex-direction: row; /* Keep elements inline */
+                align-items: center !important; /* Keep aligned */
+            }
+            .d-flex.justify-content-between.align-items-center.mb-4 h3 {
+                margin-bottom: 0;
+            }
+            .sort-dropdown {
+                width: auto; /* Reset width for larger screens */
+            }
+        }
+
+        /* Medium devices (tablets, 768px and up) */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .shop-section {
+                padding: 40px 18px;
+            }
+            /* Ensure product cards are 2 per row on medium screens */
+            .row-cols-md-2 > * { /* Explicitly set for md breakpoint */
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+        }
+
+        /* Large devices (desktops, 992px and up) and extra large devices (1200px and up)
+           No specific large changes needed, as the base CSS is typically for larger screens.
+           These breakpoints are primarily for fine-tuning if needed. */
+        @media (min-width: 992px) {
+            /* Reset product card grid for larger screens to 3 per row */
+            .row-cols-lg-3 > * {
+                flex: 0 0 33.333333%;
+                max-width: 33.333333%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="https://via.placeholder.com/150x40?text=E-Commerce" alt="Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="about.html">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contact.html">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-shopping-cart"></i> Cart</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="container shop-section">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="filter-sidebar">
+                    <h5>Categories</h5>
+                    <div class="list-group list-group-flush mb-4">
+                        <a href="#" class="list-group-item list-group-item-action">Electronics</a>
+                        <a href="#" class="list-group-item list-group-item-action">Fashion (Men)</a>
+                        <a href="#" class="list-group-item list-group-item-action">Fashion (Women)</a>
+                        <a href="#" class="list-group-item list-group-item-action">Home & Kitchen</a>
+                        <a href="#" class="list-group-item list-group-item-action">Books</a>
+                        <a href="#" class="list-group-item list-group-item-action">Sports & Outdoors</a>
+                        <a href="#" class="list-group-item list-group-item-action">Beauty & Health</a>
+                    </div>
+
+                    <h5>Price Range</h5>
+                    <div class="mb-3">
+                        <label for="minPrice" class="form-label">Min Price:</label>
+                        <input type="range" class="form-range" id="minPrice" min="0" max="500" value="0" oninput="document.getElementById('minPriceVal').innerText = this.value">
+                        <p class="text-center">₹ <span id="minPriceVal">0</span></p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="maxPrice" class="form-label">Max Price:</label>
+                        <input type="range" class="form-range" id="maxPrice" min="0" max="1000" value="1000" oninput="document.getElementById('maxPriceVal').innerText = this.value">
+                        <p class="text-center">₹ <span id="maxPriceVal">1000</span></p>
+                    </div>
+                    <button class="btn btn-outline-primary w-100">Apply Filters</button>
+                </div>
+            </div>
+
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>All Products</h3>
+                    <div class="dropdown sort-dropdown">
+                        <button class="btn dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Sort by: Popularity
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="sortDropdown">
+                            <li><a class="dropdown-item" href="#">Popularity</a></li>
+                            <li><a class="dropdown-item" href="#">Price: Low to High</a></li>
+                            <li><a class="dropdown-item" href="#">Price: High to Low</a></li>
+                            <li><a class="dropdown-item" href="#">Newest Arrivals</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-3 g-4">
+                    <div class="col">
+                        <div class="card product-card">
+                            <img src="https://picsum.photos/400/300?random=25" class="card-img-top" alt="Product 1">
+                            <div class="card-body">
+                                <h5 class="card-title">Ergonomic Office Chair</h5>
+                                <p class="card-text price">₹12,500</p>
+                                <button class="btn btn-primary">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card product-card">
+                            <img src="https://picsum.photos/400/300?random=26" class="card-img-top" alt="Product 2">
+                            <div class="card-body">
+                                <h5 class="card-title">Noise-Cancelling Headphones</h5>
+                                <p class="card-text price">₹7,999</p>
+                                <button class="btn btn-primary">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card product-card">
+                            <img src="https://picsum.photos/400/300?random=27" class="card-img-top" alt="Product 3">
+                            <div class="card-body">
+                                <h5 class="card-title">Smartwatch Pro</h5>
+                                <p class="card-text price">₹15,000</p>
+                                <button class="btn btn-primary">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card product-card">
+                            <img src="https://picsum.photos/400/300?random=28" class="card-img-top" alt="Product 4">
+                            <div class="card-body">
+                                <h5 class="card-title">Portable Bluetooth Speaker</h5>
+                                <p class="card-text price">₹3,499</p>
+                                <button class="btn btn-primary">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card product-card">
+                            <img src="https://picsum.photos/400/300?random=29" class="card-img-top" alt="Product 5">
+                            <div class="card-body">
+                                <h5 class="card-title">Luxury Leather Wallet</h5>
+                                <p class="card-text price">₹2,800</p>
+                                <button class="btn btn-primary">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card product-card">
+                            <img src="https://picsum.photos/400/300?random=30" class="card-img-top" alt="Product 6">
+                            <div class="card-body">
+                                <h5 class="card-title">Classic Analog Camera</h5>
+                                <p class="card-text price">₹9,200</p>
+                                <button class="btn btn-primary">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card product-card">
+                            <img src="https://picsum.photos/400/300?random=31" class="card-img-top" alt="Product 7">
+                            <div class="card-body">
+                                <h5 class="card-title">Yoga Mat Eco-Friendly</h5>
+                                <p class="card-text price">₹1,200</p>
+                                <button class="btn btn-primary">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card product-card">
+                            <img src="https://picsum.photos/400/300?random=32" class="card-img-top" alt="Product 8">
+                            <div class="card-body">
+                                <h5 class="card-title">Stainless Steel Water Bottle</h5>
+                                <p class="card-text price">₹650</p>
+                                <button class="btn btn-primary">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card product-card">
+                            <img src="https://picsum.photos/400/300?random=33" class="card-img-top" alt="Product 9">
+                            <div class="card-body">
+                                <h5 class="card-title">Minimalist Backpack</h5>
+                                <p class="card-text price">₹4,500</p>
+                                <button class="btn btn-primary">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card product-card">
+                            <img src="https://picsum.photos/400/300?random=34" class="card-img-top" alt="Product 10">
+                            <div class="card-body">
+                                <h5 class="card-title">Coffee Maker Pro</h5>
+                                <p class="card-text price">₹8,999</p>
+                                <button class="btn btn-primary">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card product-card">
+                            <img src="https://picsum.photos/400/300?random=35" class="card-img-top" alt="Product 11">
+                            <div class="card-body">
+                                <h5 class="card-title">Gaming Mouse RGB</h5>
+                                <p class="card-text price">₹1,800</p>
+                                <button class="btn btn-primary">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card product-card">
+                            <img src="https://picsum.photos/400/300?random=36" class="card-img-top" alt="Product 12">
+                            <div class="card-body">
+                                <h5 class="card-title">Comfortable Running Shoes</h5>
+                                <p class="card-text price">₹5,200</p>
+                                <button class="btn btn-primary">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <nav aria-label="Page navigation example" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>About Us</h5>
+                    <p>We are dedicated to providing the best products and customer service. Shop with confidence!</p>
+                    <div class="social-icons mt-3">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-4 mb-md-0">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#">Shop</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4 mb-md-0">
+                    <h5>Categories</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Electronics</a></li>
+                        <li><a href="#">Fashion</a></li>
+                        <li><a href="#">Home & Kitchen</a></li>
+                        <li><a href="#">Books</a></li>
+                        <li><a href="#">Sports</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact Info</h5>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 E-commerce Street, City, Country</p>
+                    <p><i class="fas fa-phone"></i> +1 (123) 456-7890</p>
+                    <p><i class="fas fa-envelope"></i> info@ecommerce.com</p>
+                </div>
+            </div>
+            <div class="row bottom-bar">
+                <div class="col-12">
+                    <p class="mb-0">© 2025 E-commerce. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
